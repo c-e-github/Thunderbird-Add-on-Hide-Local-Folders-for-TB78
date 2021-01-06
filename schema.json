@@ -1,0 +1,13 @@
+[
+  {
+    "namespace": "myapi",
+    "functions": [
+      {
+        "name": "hidelocalfolder",
+        "type": "function",
+        "async": true,
+        "parameters": []
+      }
+    ]
+  }
+]

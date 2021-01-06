@@ -1,0 +1,42 @@
+{
+  "manifest_version": 2,
+  "name": "Hide Local Folders for TB78++",
+  "description": "Removes the 'Local Folders' entry from the folder pane.",
+  "version": "1.0",
+  "author": "C-E",
+  "icons": {
+      "16": "hide.svg",
+      "24": "hide.svg",
+      "32": "hide.svg",
+      "48": "hide.svg",
+      "64": "hide.svg",
+      "96": "hide.svg"
+  },
+   "applications": {
+      "gecko": {
+         "id": "hlf@pharqcon.com",
+         "strict_min_version": "78.0"
+      }
+   },
+  "experiment_apis": {
+    "myapi": {
+      "schema": "schema.json",
+      "parent": {
+        "scopes": [
+          "addon_parent"
+        ],
+        "paths": [
+          [
+            "myapi"
+          ]
+        ],
+        "script": "implementation.js"
+      }
+    }
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  }
+}
