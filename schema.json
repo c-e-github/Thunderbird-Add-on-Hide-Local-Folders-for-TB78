@@ -6,7 +6,12 @@
         "name": "hidelocalfolder",
         "type": "function",
         "async": true,
-        "parameters": []
+        "parameters": [
+          {
+            "name": "windowId",
+            "type": "integer"
+          }
+        ]
       }
     ]
   }

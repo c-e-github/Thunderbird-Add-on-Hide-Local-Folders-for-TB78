@@ -3,26 +3,36 @@ var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
 
 var myapi = class extends ExtensionCommon.ExtensionAPI {
    getAPI(context) {
-      let self = this;
+      let self = this;     
+      context.callOnClose(this);
 
+      // keep track of windows manipulated by this API
+      this.manipulatedWindows = [];
+      
       return {
          myapi: {
-            async hidelocalfolder() {
-               self.recentWindow = Services.wm.getMostRecentWindow("mail:3pane");
-               if (self.recentWindow) {
-                  self.recentWindow.hideLocalFolderBackup = self.recentWindow.gFolderTreeView._rebuild;
-                  self.recentWindow.gFolderTreeView._rebuild = function(){
-                     self.recentWindow.hideLocalFolderBackup.call(self.recentWindow.gFolderTreeView);
-                     cleanTree();
-                  };
-                  self.recentWindow.gFolderTreeView._rebuild();
+            async hidelocalfolder(windowId) {
+               if (!windowId)
+                  return false;
+               
+               //get the real window belonging to the WebExtebsion window ID               
+               let requestedWindow = context.extension.windowManager.get(windowId, context).window;              
+               if (!requestedWindow)
+                  return false;
 
-                  function cleanTree() {
-                     for(let i = self.recentWindow.gFolderTreeView._rowMap.length -1; i >= 0 ; i--){
-                        if(self.recentWindow.gFolderTreeView._rowMap[i]._folder.hostname == 'Local Folders'){
-                           self.recentWindow.gFolderTreeView._rowMap.splice(i, 1);
-                           self.recentWindow.gFolderTreeView._tree.rowCountChanged(i, -1);
-                        }
+               self.manipulatedWindows.push(requestedWindow);
+               requestedWindow.hideLocalFolderBackup = requestedWindow.gFolderTreeView._rebuild;
+               requestedWindow.gFolderTreeView._rebuild = function(){
+                  requestedWindow.hideLocalFolderBackup.call(requestedWindow.gFolderTreeView);
+                  cleanTree();
+               };
+               requestedWindow.gFolderTreeView._rebuild();
+
+               function cleanTree() {
+                  for(let i = requestedWindow.gFolderTreeView._rowMap.length -1; i >= 0 ; i--){
+                     if(requestedWindow.gFolderTreeView._rowMap[i]._folder.hostname == 'Local Folders'){
+                        requestedWindow.gFolderTreeView._rowMap.splice(i, 1);
+                        requestedWindow.gFolderTreeView._tree.rowCountChanged(i, -1);
                      }
                   }
                }
@@ -30,15 +40,21 @@ var myapi = class extends ExtensionCommon.ExtensionAPI {
          },
       };
    }
-//------------------------------------------------------------------------------------
+   
+   close() {
+      // This is called when the API shuts down. This API could be invoked multiple times in different contexts
+      // and we therefore need to cleanup actions done by this API here.
+      for (let manipulatedWindow of this.manipulatedWindows) {
+         manipulatedWindow.gFolderTreeView._rebuild = manipulatedWindow.hideLocalFolderBackup;
+         manipulatedWindow.gFolderTreeView._rebuild();
+      }
+   }
+
    onShutdown(isAppShutdown) {
-      // This is called when the add-on or Thunderbird itself is shutting down
+      // This is called when the add-on or Thunderbird itself is shutting down. 
       if (isAppShutdown) {
          return;
       }
-      this.recentWindow.gFolderTreeView._rebuild = this.recentWindow.hideLocalFolderBackup;
-      this.recentWindow.gFolderTreeView._rebuild();
       Services.obs.notifyObservers(null, "startupcache-invalidate", null);
    }
-//------------------------------------------------------------------------------------
 };
