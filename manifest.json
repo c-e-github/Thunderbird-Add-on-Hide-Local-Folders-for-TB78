@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Hide Local Folders for TB78++",
   "description": "Removes the 'Local Folders' entry from the folder pane.",
-  "version": "1.0",
+  "version": "1.0.1",
   "author": "C-E",
   "icons": {
       "16": "hide.svg",
