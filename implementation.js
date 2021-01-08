@@ -1,11 +1,10 @@
 var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
 var { Services } = ChromeUtils.import("resource://gre/modules/Services.jsm");
-var recentWindow;
 
 var myapi = class extends ExtensionCommon.ExtensionAPI {
    getAPI(context) {
       let self = this;
-      
+
       return {
          myapi: {
             async hidelocalfolder() {
@@ -31,8 +30,8 @@ var myapi = class extends ExtensionCommon.ExtensionAPI {
          },
       };
    }
-
-   onShutdown(isAppShutdown) {    
+//------------------------------------------------------------------------------------
+   onShutdown(isAppShutdown) {
       // This is called when the add-on or Thunderbird itself is shutting down
       if (isAppShutdown) {
          return;
@@ -41,5 +40,5 @@ var myapi = class extends ExtensionCommon.ExtensionAPI {
       this.recentWindow.gFolderTreeView._rebuild();
       Services.obs.notifyObservers(null, "startupcache-invalidate", null);
    }
-
+//------------------------------------------------------------------------------------
 };
