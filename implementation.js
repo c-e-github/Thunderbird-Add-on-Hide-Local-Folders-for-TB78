@@ -32,7 +32,8 @@ var myapi = class extends ExtensionCommon.ExtensionAPI {
                   for(let i = requestedWindow.gFolderTreeView._rowMap.length -1; i >= 0 ; i--){
                      if(requestedWindow.gFolderTreeView._rowMap[i]._folder.hostname == 'Local Folders'){
                         requestedWindow.gFolderTreeView._rowMap.splice(i, 1);
-                        requestedWindow.gFolderTreeView._tree.rowCountChanged(i, -1);
+                        if (requestedWindow.gFolderTreeView._tree !== null)
+                          requestedWindow.gFolderTreeView._tree.rowCountChanged(i, -1);
                      }
                   }
                }
